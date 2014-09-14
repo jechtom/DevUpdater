@@ -20,37 +20,29 @@ namespace DevUpdater.Repositories.Remote
             return new RemoteCertificateValidationCallback(
                 (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
                 {
-                    switch (sslPolicyErrors)
+                    if(sslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateNotAvailable))
+                        return false;
+                    
+                    // compare server thumbprint
+                    var result = serverCertThumb.Equals(new Hash(certificate.GetCertHash()));
+                    if (result == true)
                     {
-                        case SslPolicyErrors.None:
-                        case SslPolicyErrors.RemoteCertificateChainErrors:
-                        case SslPolicyErrors.RemoteCertificateNameMismatch:
-                            // compare server thumbprint
-                            var result = serverCertThumb.Equals(new Hash(certificate.GetCertHash()));
-                            if (result == true)
-                            {
-                                if (!serverCertAccepted)
-                                {
-                                    serverCertAccepted = true;
-                                    Trace.WriteLine("Server certificate accepted:");
-                                    Trace.WriteLine(" - thumb: " + ByteArrayHelper.ByteArrayToString(certificate.GetCertHash()));
-                                    Trace.WriteLine(" - public key: " + certificate.GetPublicKey().Length * 8 + " bits");
-                                    Trace.WriteLine(" - alg: " + certificate.GetKeyAlgorithm());
-                                    Trace.WriteLine(" - expiration: " + certificate.GetExpirationDateString());
-                                }
-                            }
-                            else
-                            {
-                                Trace.WriteLine("Server certificate thumbprint mismatch!");
-                            }
-                            return result;
-
-                        case SslPolicyErrors.RemoteCertificateNotAvailable:
-                        default:
-                            // unauthenticated
-                            return false;
+                        if (!serverCertAccepted)
+                        {
+                            serverCertAccepted = true;
+                            Trace.WriteLine("Server certificate accepted:");
+                            Trace.WriteLine(" - thumb: " + ByteArrayHelper.ByteArrayToString(certificate.GetCertHash()));
+                            Trace.WriteLine(" - public key: " + certificate.GetPublicKey().Length * 8 + " bits");
+                            Trace.WriteLine(" - alg: " + certificate.GetKeyAlgorithm());
+                            Trace.WriteLine(" - expiration: " + certificate.GetExpirationDateString());
+                        }
                     }
-                });
+                    else
+                    {
+                        Trace.WriteLine("Server certificate thumbprint mismatch!");
+                    }
+                    return result;
+            });
         }
     }
 }

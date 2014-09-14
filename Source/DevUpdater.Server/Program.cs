@@ -16,15 +16,21 @@ namespace DevUpdater.Server
         static void Main(string[] args)
         {
             TraceSource ts = new TraceSource("console");
+            ts.Switch.Level = SourceLevels.All;
             ts.Listeners.Add(new ConsoleTraceListener());
             try
             {
                 // start
                 var serverApp = new ServerApp(ts);
-                using (serverApp.Run())
+                using (serverApp.Run(args))
                 {
                     Console.WriteLine("Server started.");
                     Thread.Sleep(Timeout.Infinite);
+
+                    //serverApp.ShowControlForm();
+                    //Console.WriteLine("Server started.");
+                    //Console.WriteLine("Press [Enter] to exit...");
+                    //Console.ReadLine();
                 }
             }
             catch (Exception e)

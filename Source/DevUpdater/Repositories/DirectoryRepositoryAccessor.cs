@@ -53,6 +53,9 @@ namespace DevUpdater.Repositories
 
         private List<FileInfo> ResolveFiles()
         {
+            if (!Directory.Exists(Path)) // not exists yet
+                return new List<FileInfo>();
+
             using (HashAlgorithm hashAlg = hashAlgFactory())
             {
                 var result = Directory.GetFiles(Path, "*.*", SearchOption.AllDirectories).Select(f => ResolveFile(hashAlg, f));

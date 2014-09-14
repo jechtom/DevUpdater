@@ -51,29 +51,34 @@ namespace DevUpdater.Client
 
         private void ParseArgs(string[] args)
         {
-            // default config file or given config file as parameter
+            // default config file
             string configFile = System.IO.Path.Combine(FileHelper.CurrentDir, "client-settings.xml");
+
+            // override repository? (first parameter)
+            string repositoryName = null;
             if (args != null && args.Length >= 1)
-                configFile = args[0];
+                repositoryName = args[0];
+
+            // override config file (second parameter
+            if (args != null && args.Length >= 2)
+                configFile = args[1];
 
             // read config
             config = (Configuration.Client)System.Xaml.XamlServices.Load(configFile);
-
-            // override repository? second parameter
-            if (args != null && args.Length >= 2)
-                config.Repository = args[1];
-
+            if (repositoryName != null)
+                config.Repository = repositoryName;
+            
             // show settings
             ts.TraceInformation("Settings:");
             ts.TraceInformation(" - Server certificate hash: " + config.ServerCertificateHash);
             ts.TraceInformation(" - URL: " + config.ServerUrl);
-            ts.TraceInformation(" - Repository: " + config.Repository);
+            ts.TraceInformation(" - Repository: [{0}]", config.Repository);
         }
 
         private void ResolveClientCertificate()
         {
             // client cert - get or create
-            ts.TraceInformation("Client certificate:");
+            ts.TraceInformation("Resolving client certificate:");
             string certificatePath = System.IO.Path.Combine(FileHelper.EnsureRootSettingsDirectory(), "devupdater-client-cert.pfx");
             X509Certificate2 cert;
             var newCert = new ClientCertificateResolver(new CertificateGenerator(), certificatePath).ResolveOrGenerateCertificate(out cert);
@@ -90,7 +95,7 @@ namespace DevUpdater.Client
         private void InitLocalRepository()
         {
             string repoFolder = config.ServerUrl.Authority.Replace(':','_'); // folder from host name and port
-            string localRepoPath = System.IO.Path.Combine(FileHelper.CurrentDir, "appcache", repoFolder);
+            string localRepoPath = System.IO.Path.Combine(FileHelper.CurrentDir, "appcache", repoFolder, config.Repository);
             var localRepositoryAccessor = new DirectoryRepositoryAccessor(localRepoPath, config.Repository);
             localRepository = localRepositoryAccessor.FetchRepository().Result;
         }

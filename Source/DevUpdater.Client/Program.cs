@@ -17,6 +17,7 @@ namespace DevUpdater.Client
         static void Main(string[] args)
         {
             TraceSource ts = new TraceSource("console");
+            ts.Switch.Level = SourceLevels.All;
             ts.Listeners.Add(new ConsoleTraceListener());
             try
             {

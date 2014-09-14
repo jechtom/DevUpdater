@@ -10,6 +10,7 @@ namespace DevUpdater.Repositories
     {
         public Repository(string id, IRepositoryAccessor accessor)
         {
+            this.Id = id;
             this.Accessor = accessor;
         }
 

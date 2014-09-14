@@ -2,6 +2,6 @@
 <Client xmlns="clr-namespace:DevUpdater.Client.Configuration;assembly=DevUpdater.Client">
   <Client.ServerUrl>https://server:25427/</Client.ServerUrl>
   <Client.ServerCertificateHash>dc791029197fb1413478336bccd59dc2e223e42c</Client.ServerCertificateHash>
-  <Client.Repository>sample</Client.Repository>
-  <Client.WaitForExitAndStartAgain>True</Client.WaitForExitAndStartAgain>
+  <Client.Repository>test</Client.Repository>
+  <Client.WaitForExitAndStartAgain>False</Client.WaitForExitAndStartAgain>
 </Client>

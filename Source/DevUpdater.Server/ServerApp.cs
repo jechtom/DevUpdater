@@ -27,12 +27,12 @@ namespace DevUpdater.Server
             Current = this;
         }
 
-        public IDisposable Run()
+        public IDisposable Run(string[] args)
         {
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
             ts.TraceInformation("DEV UPDATER SERVER v" + version);
 
-            ReadSettings();
+            ReadSettings(args);
 
             InitRepositories();
 
@@ -47,10 +47,25 @@ namespace DevUpdater.Server
             return WebApp.Start<Startup>(owinSettings);
         }
 
-        private void ReadSettings()
+        public async Task RefreshRepositories()
         {
+            await Task.Run(() =>
+            {
+                InitRepositories();
+                ts.TraceInformation("Completed.");
+            });
+        }
+
+        private void ReadSettings(string[] args)
+        {
+            string configPath = Path.Combine(FileHelper.CurrentDir, "server-settings.xml");
+
+            // override config path?
+            if (args != null && args.Length >= 1)
+                configPath = args[0];
+
             // read config
-            config = (Configuration.Server)XamlServices.Load(Path.Combine(FileHelper.CurrentDir, "server-settings.xml"));
+            config = (Configuration.Server)XamlServices.Load(configPath);
         }
 
         private void InitRepositories()
@@ -67,12 +82,25 @@ namespace DevUpdater.Server
                 var sourceRepo = sourceRepoAccessor.FetchRepository().Result;
                 var cacheRepo = cacheRepoAccessor.FetchRepository().Result;
 
+                // apply settings to repository
+                sourceRepo.Settings = new DevUpdater.Repositories.RepositorySettings()
+                {
+                    Command = repo.Command,
+                    CommandArgs = repo.CommandArgs
+                };
+
+                // synchronize
                 var processor = new Repositories.RepositoryProcessor(ts);
                 processor.Synchronize(sourceRepo, cacheRepo).Wait();
                 dict.Add(repo.Id, cacheRepo);
             }
 
             this.Repositories = dict;
+        }
+
+        public void ShowControlForm()
+        {
+            // not yet
         }
     }
 }

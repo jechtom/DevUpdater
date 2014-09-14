@@ -8,6 +8,9 @@ namespace DevUpdater.Server
     public class AuthorizedClient
     {
         public byte[] Hash { get; set; }
+
         public string Name { get; set; }
+
+        //Future release - access rights: public string[] Repositories { get; set; }
     }
 }

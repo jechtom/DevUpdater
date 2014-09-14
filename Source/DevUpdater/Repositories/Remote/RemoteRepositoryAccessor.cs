@@ -47,7 +47,7 @@ namespace DevUpdater.Repositories.Remote
         public async Task<byte[]> ReadFileAsBytes(FileInfo file)
         {
             HttpClient client = context.CreateWebClient();
-            var httpResult = await client.GetAsync(new Uri(BaseUrlWithRepo, "files/" + file.Hash.ToString()));
+            var httpResult = await client.GetAsync(new Uri(BaseUrlWithRepo, "file/" + file.Hash.ToString()));
             httpResult.EnsureSuccessStatusCode();
             var result = httpResult.Content.ReadAsByteArrayAsync().Result;
             return result;
@@ -63,13 +63,13 @@ namespace DevUpdater.Repositories.Remote
         {
             get
             {
-                return new Uri(context.BaseUrl, "repositories/" + RepositoryName);
+                return new Uri(context.BaseUrl, "repositories/" + RepositoryName + "/");
             }
         }
 
         public bool IsFileSystemRepository
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         public Task WriteFromFile(string sourceFilePath, FileInfo targetFile)

@@ -48,7 +48,8 @@ namespace DevUpdater.Server
                             Console.WriteLine("Enter name of client:");
                             string nickName = Console.ReadLine();
                             accept = true;
-                            Options.ClientList.Add(new AuthorizedClient() { Hash = thumb, Name = nickName });
+                            client = new AuthorizedClient() { Hash = thumb, Name = nickName };
+                            Options.ClientList.Add(client);
                             Console.WriteLine("Client accepted.");
                         }
                         else
@@ -71,6 +72,9 @@ namespace DevUpdater.Server
             
             var identity = new GenericIdentity(new Hash(cert.GetCertHash()).ToString());
             identity.AddClaim(new Claim("nickname", client.Name));
+            //Future release: access rights:
+            // foreach (var item in client.Repositories)
+	        //    identity.AddClaim(new Claim("repositories", item));
             var ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
             return Task.FromResult<AuthenticationTicket>(ticket);
         }

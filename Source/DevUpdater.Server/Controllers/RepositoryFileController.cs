@@ -12,23 +12,27 @@ using System.Web.Http;
 namespace DevUpdater.Server.Controllers
 {
     [Authorize]
-    public class RepositoryFileController : ApiController
+    public class RepositoryFileController :  ApiController
     {
-        public HttpResponseMessage Get(string repository, string id)
+        public async Task<IHttpActionResult> Get(string repository, string id)
         {
-            throw new InvalidOperationException();
-            //var item = RepositoryController.Version.GetByHash(id);
-            //if (item == null)
-            //    return new HttpResponseMessage(HttpStatusCode.NotFound);
+            var app = DevUpdater.Server.ServerApp.Current;
+            Repositories.Repository repo;
 
-            //string path = item.ResolveFullPath(RepositoryController.RootDirectory);
+            if (!app.Repositories.TryGetValue(repository, out repo))
+                return NotFound();
+
+            var hash = Hash.Parse(id);
+            var fileInfo = repo.Files.FirstOrDefault(f => f.Hash.Equals(hash));
+
+            if(fileInfo == null)
+                return NotFound();
             
-            //HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            //var stream = new FileStream(path, FileMode.Open);
-            //result.Content = new StreamContent(stream);
-            //result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            //return result;
+            HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
+            var stream = await repo.Accessor.ReadFileAsStream(fileInfo);
+            result.Content = new StreamContent(stream);
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            return ResponseMessage(result);
         }
-
     }
 }

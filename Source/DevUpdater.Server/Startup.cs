@@ -22,15 +22,15 @@ namespace DevUpdater.Server
             var config = new System.Web.Http.HttpConfiguration();
 
             config.Routes.MapHttpRoute(
-                name: "Repository",
-                routeTemplate: "/repositories/{id}",
-                defaults: new { controller = "Repository", id = RouteParameter.Optional }
-            );
-
-            config.Routes.MapHttpRoute(
                 name: "RepositoryFile",
-                routeTemplate: "/repositories/{repository}/files/{id}",
+                routeTemplate: "repositories/{repository}/file/{id}",
                 defaults: new { controller = "RepositoryFile", id = RouteParameter.Optional }
+            );
+            
+            config.Routes.MapHttpRoute(
+                name: "Repository",
+                routeTemplate: "repositories/{id}",
+                defaults: new { controller = "Repository", id = RouteParameter.Optional }
             );
 
             app.UseWebApi(config);
