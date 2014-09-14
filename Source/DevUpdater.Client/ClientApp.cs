@@ -134,7 +134,17 @@ namespace DevUpdater.Client
             ts.TraceInformation("Executing: {0} {1}", s.Command, s.CommandArgs);
 
             string executePath = System.IO.Path.Combine(localRepository.FileSystemPath, s.Command);
-            var process = Process.Start(executePath, s.Command);
+            ts.TraceInformation("Full path:\n{0} {1}", executePath, s.CommandArgs);
+            Process process;
+            try
+            {
+                process = Process.Start(executePath, s.Command);
+            }
+            catch(Exception e)
+            {
+                ts.TraceInformation("ERROR: Cannot start process:\n" + e.Message);
+                return;
+            }
 
             Console.WriteLine("Waiting for App exit. SID: " + process.SessionId);
             process.WaitForExit();
