@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevUpdater", "..\DevUpdater.csproj", "{D5E03FEC-5807-47AE-B926-0FCB7B16838B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevUpdater", "DevUpdater\DevUpdater.csproj", "{D5E03FEC-5807-47AE-B926-0FCB7B16838B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevUpdater.Client", "..\..\DevUpdater.Client\DevUpdater.Client.csproj", "{17A5E906-0C72-4E1B-8123-0A4BD0CF5F00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevUpdater.Client", "DevUpdater.Client\DevUpdater.Client.csproj", "{17A5E906-0C72-4E1B-8123-0A4BD0CF5F00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevUpdater.Server", "..\..\DevUpdater.Server\DevUpdater.Server.csproj", "{9424AF9C-BA60-44C1-982C-CF9B9C8BEE3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevUpdater.Server", "DevUpdater.Server\DevUpdater.Server.csproj", "{9424AF9C-BA60-44C1-982C-CF9B9C8BEE3D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Version", "Version", "{56EE6388-E625-4414-9248-0F70F6648F5E}"
 	ProjectSection(SolutionItems) = preProject

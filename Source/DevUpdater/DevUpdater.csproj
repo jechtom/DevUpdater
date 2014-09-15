@@ -53,11 +53,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AssemblyInfoCommon.cs">
+      <Link>AssemblyInfoCommon.cs</Link>
+    </Compile>
     <Compile Include="ByteArrayHelpers.cs" />
     <Compile Include="Certificates\CertificateGenerator.cs" />
     <Compile Include="Certificates\ClientCertificateResolver.cs" />
     <Compile Include="Certificates\ICertificateGenerator.cs" />
-    <Compile Include="DevUpdater\AssemblyInfoCommon.cs" />
     <Compile Include="Repositories\DirectoryRepositoryAccessor.cs" />
     <Compile Include="FileHelper.cs" />
     <Compile Include="Repositories\FileInfo.cs" />
