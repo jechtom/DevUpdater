@@ -1,0 +1,1 @@
+﻿[assembly: Microsoft.Owin.OwinStartup(typeof(DevUpdater.Server.Startup))]

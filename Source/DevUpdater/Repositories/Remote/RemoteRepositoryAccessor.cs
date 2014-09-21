@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Security;
@@ -44,19 +45,14 @@ namespace DevUpdater.Repositories.Remote
             return result;
         }
 
-        public async Task<byte[]> ReadFileAsBytes(FileInfo file)
+        public async Task<Stream> ReadFileAsStream(FileInfo file)
         {
             HttpClient client = context.CreateWebClient();
             var httpResult = await client.GetAsync(new Uri(BaseUrlWithRepo, "file/" + file.Hash.ToString()));
             httpResult.EnsureSuccessStatusCode();
-            var result = httpResult.Content.ReadAsByteArrayAsync().Result;
-            return result;
-        }
-
-        public async Task<Stream> ReadFileAsStream(FileInfo file)
-        {
-            var result = await ReadFileAsBytes(file);
-            return new MemoryStream(result, writable: false);
+            var sourceStream = await httpResult.Content.ReadAsStreamAsync();
+            var gzip = new GZipStream(sourceStream, CompressionMode.Decompress, leaveOpen: false);
+            return gzip;
         }
 
         private Uri BaseUrlWithRepo
@@ -67,17 +63,13 @@ namespace DevUpdater.Repositories.Remote
             }
         }
 
-        public bool IsFileSystemRepository
+        public bool IsReadOnly
         {
-            get { return false; }
+            get { return true; }
         }
 
-        public Task WriteFromFile(string sourceFilePath, FileInfo targetFile)
-        {
-            throw new NotSupportedException();
-        }
 
-        public Task WriteFromBytes(byte[] content, FileInfo targetFile)
+        public Task WriteFromStream(Stream sourceStream, FileInfo[] targets)
         {
             throw new NotSupportedException();
         }

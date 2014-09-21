@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin.Security;
+﻿using DevUpdater.Server.Services;
+using Microsoft.Owin.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +12,18 @@ namespace DevUpdater.Server
     {
         HashSet<string> pendingCerts = new HashSet<string>();
 
-        public AuthenticationClientCertListOptions(AuthorizedClientsList list)
+        public AuthenticationClientCertListOptions(SecurityService service)
             : base("client-cert-list")
         {
-            this.ClientList = list;
+            this.SecurityService = service;
         }
-
-        public AuthorizedClientsList ClientList { get; set; }
 
         public bool AddPending(byte[] thumb)
         {
             lock(pendingCerts)
                 return pendingCerts.Add(ByteArrayHelper.ByteArrayToString(thumb));
         }
+
+        public SecurityService SecurityService { get; set; }
     }
 }

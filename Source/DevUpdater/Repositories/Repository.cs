@@ -10,7 +10,7 @@ namespace DevUpdater.Repositories
     {
         public Repository(string id, IRepositoryAccessor accessor)
         {
-            this.Id = id;
+            this.UrlName = id;
             this.Accessor = accessor;
         }
 
@@ -22,6 +22,6 @@ namespace DevUpdater.Repositories
 
         public IRepositoryAccessor Accessor { get; set; }
 
-        public string Id { get; set; }
+        public string UrlName { get; set; }
     }
 }

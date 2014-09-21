@@ -35,14 +35,14 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>DevUpdater\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>DevUpdater\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Security" />
@@ -60,6 +60,7 @@
     <Compile Include="Certificates\CertificateGenerator.cs" />
     <Compile Include="Certificates\ClientCertificateResolver.cs" />
     <Compile Include="Certificates\ICertificateGenerator.cs" />
+    <Compile Include="Repositories\DirectoryCompressedRepositoryAccessor.cs" />
     <Compile Include="Repositories\DirectoryRepositoryAccessor.cs" />
     <Compile Include="FileHelper.cs" />
     <Compile Include="Repositories\FileInfo.cs" />
@@ -74,6 +75,12 @@
     <Compile Include="Repositories\RepositoryProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\RepositorySettings.cs" />
+    <Compile Include="Server\Models\ClientModel.cs" />
+    <Compile Include="Server\Models\GroupModel.cs" />
+    <Compile Include="Server\Models\PendingCertificateModel.cs" />
+    <Compile Include="Server\Models\RepositoryModel.cs" />
+    <Compile Include="Server\Models\ServerInfoModel.cs" />
+    <Compile Include="Server\Models\SettingsModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

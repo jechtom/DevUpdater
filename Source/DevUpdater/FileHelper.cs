@@ -14,7 +14,7 @@ namespace DevUpdater
         {
             get
             {
-                return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             }
         }
 

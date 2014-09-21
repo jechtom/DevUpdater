@@ -42,7 +42,7 @@ namespace DevUpdater.Repositories
                 }).ToArray();
 
             // debug - source repository
-            ts.TraceInformation("Source respository [{0}]:", source.Id);
+            ts.TraceInformation("Source respository [{0}]:", source.UrlName);
             ts.TraceInformation(" - Files: {0}", sourceFiles.Count);
 
             if(sourceFiles.Count > 0)
@@ -71,8 +71,8 @@ namespace DevUpdater.Repositories
 
         public async Task Synchronize(IEnumerable<FileInfoCopyCommand> filesToSynchronize, Repository source, Repository target)
         {
-            if (!target.Accessor.IsFileSystemRepository)
-                throw new InvalidOperationException("Only file system repositories are supported synchronization target.");
+            if (target.Accessor.IsReadOnly)
+                throw new InvalidOperationException("Target repository is read only.");
 
             long totalSize = filesToSynchronize.Sum(f => f.Source.Size);
             long copiedSize = 0;
@@ -88,30 +88,16 @@ namespace DevUpdater.Repositories
 
                 copiedSize += item.Source.Size;
 
-                if(source.Accessor.IsFileSystemRepository)
+                var targets = item.Targets.ToArray();
+                using (var stream = await source.Accessor.ReadFileAsStream(item.Source))
                 {
-                    // copy from file
-                    var sourcePath = item.Source.ResolveFullPath(source.FileSystemPath);
-                    foreach (var targetFile in item.Targets)
-	                {
-                        await target.Accessor.WriteFromFile(sourcePath, targetFile);
-                    }
-                }
-                else
-                {
-                    // copy from bytes
-                    byte[] content = await source.Accessor.ReadFileAsBytes(item.Source);
-                    
-                    foreach (var targetFile in item.Targets)
-                    {
-                        await target.Accessor.WriteFromBytes(content, targetFile);
-                    }
+                    await target.Accessor.WriteFromStream(stream, targets);
                 }
             }
 
             // synchronize properties
             target.Files = source.Files;
-            target.Id = source.Id;
+            target.UrlName = source.UrlName;
             target.Settings = source.Settings;
 
             ts.TraceInformation("[100%] Completed!");

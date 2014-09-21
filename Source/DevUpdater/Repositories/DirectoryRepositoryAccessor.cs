@@ -44,13 +44,6 @@ namespace DevUpdater.Repositories
             return Task.FromResult<Stream>(result);
         }
 
-        public Task<byte[]> ReadFileAsBytes(FileInfo file)
-        {
-            // remark: can be rewritten as async
-            var result = File.ReadAllBytes(file.ResolveFullPath(Path));
-            return Task.FromResult<byte[]>(result);
-        }
-
         private List<FileInfo> ResolveFiles()
         {
             if (!Directory.Exists(Path)) // not exists yet
@@ -90,25 +83,32 @@ namespace DevUpdater.Repositories
             }
         }
         
-        public bool IsFileSystemRepository
+        public bool IsReadOnly
         {
-            get { return true; }
+            get { return false; }
         }
 
-        public Task WriteFromFile(string sourceFilePath, FileInfo targetFile)
+        public async Task WriteFromStream(Stream sourceStream, FileInfo[] targets)
         {
-            // remark: can be rewriten as async
-            targetFile.EnsureParentDirectoryExists(Path);
-            File.Copy(sourceFilePath, targetFile.ResolveFullPath(Path), overwrite: true);
-            return Task.FromResult<object>(null);
-        }
+            // create copy if multiple targets
+            if(targets.Length > 1)
+            {
+                var copy = new MemoryStream();
+                await sourceStream.CopyToAsync(copy);
+                sourceStream = copy;
+            }
 
-        public Task WriteFromBytes(byte[] content, FileInfo targetFile)
-        {
-            // remark: can be rewriten as async
-            targetFile.EnsureParentDirectoryExists(Path);
-            File.WriteAllBytes(targetFile.ResolveFullPath(Path), content);
-            return Task.FromResult<object>(null);
+            foreach (var target in targets)
+            {
+                target.EnsureParentDirectoryExists(Path);
+                string targetPath = target.ResolveFullPath(Path);
+
+                using (var fileStream = new FileStream(targetPath, FileMode.Create))
+                {
+                    await sourceStream.CopyToAsync(fileStream);
+                    await fileStream.FlushAsync();
+                }
+            }
         }
     }
 }

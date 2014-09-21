@@ -1,0 +1,105 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Dev Updater Server Console</title>
+    <!--<link rel="stylesheet" type="text/css" href="../css/styles.css" />-->
+    <!--<link rel="shortcut icon" href="../img/favicon.ico" />-->
+    <script type="text/javascript" src="jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="knockout-3.2.0.js"></script>
+    <script type="text/javascript" src="knockout_mapping.js"></script>
+    <style>
+        body {
+            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        thead {
+            background-color: #e8e8e8;
+        }
+        td {
+            border: 1px solid #e8e8e8;
+            padding: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div data-bind="visible: Screen() == 'Init'">
+        <h1>DEV Updater Server Console</h1>
+        <h2>Contacting server...</h2>
+    </div>
+    <div data-bind="visible: Screen() != 'Init'">
+        <h1>DEV Updater Server Console (v<span data-bind="text: Server().Version"></span>)</h1>
+        <ul class="menu">
+            <li><a href="#" data-bind="click: $root.ChangePage('Main')">Main Page</a></li>
+            <li><a href="#" data-bind="click: $root.ChangePage('PendingCertificates')">Pending Certificates</a></li>
+        </ul>
+        <div data-bind="visible: Screen() == 'PendingCertificates'">
+            <h2>Pending Certificates</h2>
+        </div>
+        <div data-bind="visible: Screen() == 'Main'">
+            <h2>Information About Client</h2>
+            <p>Is client authenticated? <strong data-bind="text: Server().IsAuthenticated() ? 'Yes' : 'No'"></strong></p>
+            <h3>Member Of Groups</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <td>
+                            Group Name
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-bind="foreach: Server().Groups">
+                        <td data-bind="text: $data"></td>
+                    </tr>
+                    <tr data-bind="if: Server().Groups.Length == 0">
+                        <td>No groups assigned</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div data-bind="visible: Screen() == 'Main'">
+            Hello! Main page
+        </div>
+        <script>
+            function ServerInfoModel() {
+                var self = this;
+                self.Version = ko.observable();
+                self.Groups = ko.observableArray();
+                self.IsAuthenticated = ko.observable(false);
+            }
+
+            function AppViewModel(baseUrl) {
+                var self = this;
+                self.Screen = ko.observable("Init");
+                self.ServerBaseUrl = baseUrl;
+                self.Server = ko.observable(new ServerInfoModel());
+
+                self.Refresh = function () {
+                    $.ajax({
+                        url: self.ServerBaseUrl + "/serverinfo",
+                        success: function (data) {
+                            self.Server(ko.mapping.fromJS(data));
+                            self.Screen("Main");
+                        }
+                    });
+                };
+
+                self.ChangePage = function (newPage) {
+                    self.Screen(newPage);
+                    return false;
+                };
+            }
+
+            // Activates knockout.js
+            var serverBaseUrl = window.location.href.substr(0, window.location.href.lastIndexOf("/"));
+            var Model = new AppViewModel(serverBaseUrl);
+            ko.applyBindings(Model);
+
+
+            $(function () {
+                Model.Refresh();
+            });
+        </script>
+    </body>
+</html>

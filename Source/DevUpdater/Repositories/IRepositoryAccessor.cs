@@ -13,12 +13,8 @@ namespace DevUpdater.Repositories
 
         Task<Stream> ReadFileAsStream(FileInfo file);
 
-        Task<byte[]> ReadFileAsBytes(FileInfo file);
+        bool IsReadOnly { get; }
 
-        bool IsFileSystemRepository { get; }
-
-        Task WriteFromFile(string sourceFilePath, FileInfo targetFile);
-
-        Task WriteFromBytes(byte[] content, FileInfo targetFile);
+        Task WriteFromStream(Stream sourceStream, FileInfo[] targets);
     }
 }

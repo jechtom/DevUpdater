@@ -1,35 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 
 namespace DevUpdater.Server.Controllers
 {
     [Authorize]
-    public class RepositoryFileController :  ApiController
+    public class RepositoryFileController :  RepositoryControllerBase
     {
-        public async Task<IHttpActionResult> Get(string repository, string id)
+        public async Task<IHttpActionResult> Get(string repository, [ModelBinder(typeof(HashModelBinder))] Hash hash)
         {
-            var app = DevUpdater.Server.ServerApp.Current;
-            Repositories.Repository repo;
+            var error = ResolveAndAuthenticateToRepository(repository);
+            if (error != null)
+                return error;
 
-            if (!app.Repositories.TryGetValue(repository, out repo))
-                return NotFound();
-
-            var hash = Hash.Parse(id);
-            var fileInfo = repo.Files.FirstOrDefault(f => f.Hash.Equals(hash));
+            // get file
+            var fileInfo = RepositoryInstance.Value.Files.FirstOrDefault(f => f.Hash.Equals(hash));
 
             if(fileInfo == null)
                 return NotFound();
-            
+
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            var stream = await repo.Accessor.ReadFileAsStream(fileInfo);
+            var stream = await RepositoryInstance.Value.Accessor.ReadFileAsStream(fileInfo);
             result.Content = new StreamContent(stream);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
             return ResponseMessage(result);

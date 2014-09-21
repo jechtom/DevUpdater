@@ -20,6 +20,7 @@ namespace DevUpdater.Repositories.Remote
         public RemoteCertificateValidationCallback ServerCertificateValidator { get; set; }
 
         private WebRequestHandler handler;
+        private HttpClient client;
 
         public HttpClient CreateWebClient()
         {
@@ -40,10 +41,13 @@ namespace DevUpdater.Repositories.Remote
                 handler.ServerCertificateValidationCallback = ServerCertificateValidator;
             }
 
-            var result = new HttpClient(handler);
-            result.DefaultRequestHeaders.Add("x-devupdater-client-version", version.ToString()); // send version (next version will be able to reject older versions)
+            if (client == null)
+            {
+                client = new HttpClient(handler);
+                client.DefaultRequestHeaders.Add("x-devupdater-client-version", version.ToString()); // send version (next version will be able to reject older versions)
+            }
 
-            return result;
+            return client;
         }
 
         public void Dispose()

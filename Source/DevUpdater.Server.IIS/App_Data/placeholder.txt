@@ -1,0 +1,2 @@
+﻿Placeholder file!
+It makes sure this folder exists.

@@ -17,7 +17,6 @@ namespace DevUpdater.Server
 
         public AuthenticationClientCertListHandler()
         {
-
         }
 
         protected override Task<Microsoft.Owin.Security.AuthenticationTicket> AuthenticateCoreAsync()
@@ -28,53 +27,14 @@ namespace DevUpdater.Server
                 return Task.FromResult<AuthenticationTicket>(null);
             }
 
-            var thumb = cert.GetCertHash();
-            var thumbStr = ByteArrayHelper.ByteArrayToString(thumb);
-            AuthorizedClient client;
-            if (!Options.ClientList.Exists(thumb, out client))
-            {
-                bool accept = false;
-                lock (consoleSyncLock)
-                {
-                    if (Options.AddPending(thumb))
-                    {
-                        Console.WriteLine(
-                            "Unauthorized client certificate ({0}):\nTHUMB: {1}",
-                            Context.Request.RemoteIpAddress,
-                            thumbStr);
-                        Console.WriteLine("Authorize this client? (Y/N)");
-                        if(string.Equals(Console.ReadLine(), "y", StringComparison.OrdinalIgnoreCase))
-                        {
-                            Console.WriteLine("Enter name of client:");
-                            string nickName = Console.ReadLine();
-                            accept = true;
-                            client = new AuthorizedClient() { Hash = thumb, Name = nickName };
-                            Options.ClientList.Add(client);
-                            Console.WriteLine("Client accepted.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Client declined.");
-                        }
-                    }
-                }
+            ClaimsIdentity identity;
+            identity = Options.SecurityService.ProcessClientCertificate(cert, Context.Request.RemoteIpAddress);
 
-                if(!accept)
-                    return Task.FromResult<AuthenticationTicket>(null);
-            }
-            else
+            if(identity == null) // unauthenticated
             {
-                if (Options.AddPending(thumb))
-                {
-                    Console.WriteLine("Client connected: \"{0}\" ({1})", client.Name, Context.Request.RemoteIpAddress);
-                }
+                return Task.FromResult<AuthenticationTicket>(null);
             }
             
-            var identity = new GenericIdentity(new Hash(cert.GetCertHash()).ToString());
-            identity.AddClaim(new Claim("nickname", client.Name));
-            //Future release: access rights:
-            // foreach (var item in client.Repositories)
-	        //    identity.AddClaim(new Claim("repositories", item));
             var ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
             return Task.FromResult<AuthenticationTicket>(ticket);
         }

@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<Server xmlns="clr-namespace:DevUpdater.Server.Configuration;assembly=DevUpdater.Server" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <Server.Hosting>
-    <Hosting Url="https://+:25427" />
-  </Server.Hosting>
-  <Server.Repositories>
-    <Repository Id="sample" SourceFolder="c:\test" />
-  </Server.Repositories>
-</Server>
